@@ -1,0 +1,32 @@
+<script>
+    class BigoenMercureTwig extends HTMLElement {
+        constructor() {
+            super();
+            const url = new URL(this.attributes.getNamedItem('hub').value);
+
+            for (const topic of this.attributes.getNamedItem('topics').value.split(',')) {
+                url.searchParams.append('topic', topic);
+            }
+
+            const eventSource = new EventSource(url);
+            eventSource.onmessage = this.onMessage.bind(this);
+        }
+
+        async onMessage({ data }) {
+          	const isAdd = this.attributes.getNamedItem('is_add').value;
+            if (data !== '') {
+                isAdd === '1' ? this.innerHTML += data : this.innerHTML = data;
+                return;
+            }
+
+            const response = await fetch(
+                this.attributes.getNamedItem('url').value
+            );
+
+            data = await response.text();
+          	isAdd === '1' ? this.innerHTML += data : this.innerHTML = data;
+        }
+    }
+
+    customElements.define('bigoen-mercure-twig', BigoenMercureTwig);
+</script>

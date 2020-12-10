@@ -1,0 +1,16 @@
+services:
+    Bigoen\MercureTwig\Fragment\MercureTwigFragmentRenderer:
+        arguments:
+            $inlineRenderer: '@fragment.renderer.inline'
+            $signer: '@uri_signer'
+            $eventDispatcher: '@event_dispatcher'
+            $hubUrl: '%bigoen_mercure_twig.public_url%'
+        tags:
+            - { name: 'kernel.fragment_renderer', alias: 'bigoen_mercure_twig' }
+
+    Bigoen\MercureTwig\EventSubscriber\MercureTwigJavaScriptSubscriber:
+        arguments:
+            $twig: '@twig'
+            $subscriberJs: '%bigoen_mercure_twig.subscriber_js%'
+        tags:
+            - { name: 'kernel.event_subscriber' }
