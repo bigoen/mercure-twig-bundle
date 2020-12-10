@@ -15,7 +15,7 @@
         async onMessage({ data }) {
           	const isAdd = this.attributes.getNamedItem('is_add').value;
             if (data !== '') {
-                isAdd === '1' ? this.innerHTML += data : this.innerHTML = data;
+                isAdd === '1' ? this.insertAdjacentHTML("afterbegin", data) : this.innerHTML = data;
                 return;
             }
 
@@ -24,7 +24,7 @@
             );
 
             data = await response.text();
-          	isAdd === '1' ? this.innerHTML += data : this.innerHTML = data;
+          	isAdd === '1' ? this.insertAdjacentHTML("afterbegin", data) : this.innerHTML = data;
         }
     }
 
