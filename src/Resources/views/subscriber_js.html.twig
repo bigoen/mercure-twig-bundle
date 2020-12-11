@@ -1,32 +1,52 @@
+<script type="text/javascript" src="{{ asset('bundles/bigoenmercuretwig/eventsource.min.js') }}"></script>
 <script>
-    class BigoenMercureTwig extends HTMLElement {
-        constructor() {
-            super();
-            const url = new URL(this.attributes.getNamedItem('hub').value);
+  class BigoenMercureTwig extends HTMLElement {
+    constructor() {
+      super();
+      const url = new URL(this.attributes.getNamedItem('hub').value);
 
-            for (const topic of this.attributes.getNamedItem('topics').value.split(',')) {
-                url.searchParams.append('topic', topic);
-            }
+      for (const topic of this.attributes.getNamedItem('topics').value.split(',')) {
+        url.searchParams.append('topic', topic);
+      }
 
-            const eventSource = new EventSource(url);
-            eventSource.onmessage = this.onMessage.bind(this);
-        }
+      let token = null;
+      let eventSource = null;
 
-        async onMessage({ data }) {
-          	const isAdd = this.attributes.getNamedItem('is_add').value;
-            if (data !== '') {
-                isAdd === '1' ? this.insertAdjacentHTML("afterbegin", data) : this.innerHTML = data;
-                return;
-            }
-
-            const response = await fetch(
-                this.attributes.getNamedItem('url').value
-            );
-
-            data = await response.text();
-          	isAdd === '1' ? this.insertAdjacentHTML("afterbegin", data) : this.innerHTML = data;
-        }
+      if (this.attributes.getNamedItem('token') !== null) {
+        token = this.attributes.getNamedItem('token').value;
+      }
+      if (typeof token === 'string') {
+        eventSource = new EventSourcePolyfill(url, {
+          'headers': {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+      } else {
+        eventSource = new EventSource(url);
+      }
+      eventSource.onmessage = this.onMessage.bind(this);
     }
 
-    customElements.define('bigoen-mercure-twig', BigoenMercureTwig);
+    async onMessage({data}) {
+      const isAdd = this.attributes.getNamedItem('is_add').value;
+      let variable = '';
+      if (data !== '') {
+        variable = data;
+      } else {
+        const response = await fetch(
+          this.attributes.getNamedItem('url').value
+        );
+        variable = await response.text();
+      }
+      if (isAdd === '1') {
+        this.insertAdjacentHTML("afterbegin", variable);
+      } else if (isAdd === '2') {
+        this.insertAdjacentHTML("beforebegin", variable);
+      } else {
+        this.innerHTML = variable;
+      }
+    }
+  }
+
+  customElements.define('bigoen-mercure-twig', BigoenMercureTwig);
 </script>

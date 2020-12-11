@@ -76,10 +76,11 @@ class MercureController extends AbstractController
 **Twig Example:**
 - Set render controller,
 - Set mercure topics,
-- Set isAdd. Default: 0
+- Set token is private.
+- Set isAdd. Default: 0. 1 = afterbegin, 2 = beforebegin.
 ```twig
 {{ render_bigoen_mercure_twig(
     controller('App\\Controller\\MercureController::orderAction'),
-    {'topics': ['live'], 'isAdd': 1}
+    {'topics': ['live'], 'isAdd': 1, 'token': 'bearer token'}
 ) }}
 ```
